@@ -1,0 +1,5 @@
+{
+    "certFileLocation": "/etc/letsencrypt/live/www.goblincuties.com/privkey.pem",
+    "keyFileLocation": "/etc/letsencrypt/live/www.goblincuties.com/privkey.pem",
+    "port": 42000
+}

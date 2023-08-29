@@ -1,0 +1,6 @@
+{
+    "__comment": "remove certFileLocation and keyFileLocation if you don't want to use https",
+    "certFileLocation": "/etc/letsencrypt/live/www.yourwebsite.com/privkey.pem",
+    "keyFileLocation": "/etc/letsencrypt/live/www.yourwebsite.com/privkey.pem",
+    "port": 12345
+}
