@@ -1,0 +1,197 @@
+	html, body {
+		height: 100%;
+		width: 100%;
+		margin: 0;
+		background: #b5d5f5;
+	}
+	.white-1e1d7 {
+		background-color: #fefbea;
+		color: #000000;
+	}
+	.black-3c85d {
+		background-color: #647264;
+		color: #ffffff;
+	}
+	#myBoard img {
+		filter: drop-shadow(-3px 3px 4px grey);
+	}
+	#gameWrapper{
+		display: inline-flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		width: 100%;
+		height: 100%;
+	}
+	#turnOrderWrapper{
+		flex-grow: 1;
+		display: flex;
+    	flex-direction: column;
+		margin: 6px;
+	}
+	#boardWrapper{
+		flex-grow: 1;
+		display:flex;
+		max-height: 100%;
+		max-width: 60%;
+		margin: 6px;
+		justify-content: flex-end;
+	}
+	#turnOrder{
+		background: rgb(157,209,241);
+		background: linear-gradient(43deg, rgba(157,209,241,1) 0%, rgba(212,233,255,1) 33%, rgba(157,209,241,1) 79%, rgba(157,209,241,1) 100%);
+		border: #8f93a5 4px solid;
+    	border-radius: 10px;
+		flex-grow: 1;
+	}
+	#players{
+		display: flex;
+		height: 64px;
+    	flex-shrink: 0;
+		
+		background-repeat: no-repeat;
+		background-position-x: 50%;
+		background-position-y: 50%;
+		background-size: 103px;
+		border-radius: 14px;
+	}
+	.deletePlayerOverlay{
+		background: url(/img/icons8-trash-50.png);
+		background-color: #d263655c;
+	}
+	.avatarRim{
+		margin-right: 4px;
+		width: 50px;
+		height: 50px;
+		background: #b0d7ff91;
+		border: #2D3142 solid;
+		border-radius: 40px;
+	}
+	#myBoard{
+		width: calc(100% - 40px)
+		
+	}
+	@media only screen and (orientation:portrait){
+		#gameWrapper{
+			flex-direction: column;
+		}
+		#boardWrapper{
+			max-height: 50%;
+			max-width: 100%;
+			justify-content: center;
+		}
+		#turnOrderWrapper{
+			flex-grow: 12;
+		}
+	}
+	#players .avatarRim .gearIcon{
+		display: none;
+	}
+	#players .avatarRim{
+		margin-top: 5px;
+		overflow: hidden;
+	}
+	.avatarRim.playerIcon {
+		filter: hue-rotate(60deg);
+	}
+	#players .sortable-ghost{
+		display: none;
+	}
+	.robotIcon{
+		background-image: url(/img/icons8-robotic-48.png) !important;
+	}
+	#players .playerIcon{
+		background-image: url(/img/icons8-dolphin-16.png);
+		background-position: center;
+    	background-size: contain;
+	}
+	#players .playerName{
+		display:none;
+	}
+	.avatarRim.playerDisconnected{
+		filter: invert(1);
+	}
+	.avatarRim:not(.playerDisconnected) .disconnectText{
+		display: none !important;
+	}
+	.avatarRim.playerDisconnected .disconnectText{
+		display: block;
+		position: absolute;
+		color: #00d3ac;
+		font-size: 36px;
+		margin: 4px 0 0 0 !important;
+		-webkit-text-stroke-width: 2px;
+		-webkit-text-stroke-color: #00000099;
+	}
+
+	#turnOrder .avatarRim{
+		width: 100%;
+		display: flex;
+		background: #e9f4ff;
+		color: #424242;
+		justify-content: space-evenly;
+		background-position: center !important;
+    	background-repeat: no-repeat !important;
+	}
+	#turnOrder .avatarRim div{
+		flex-grow: 1;
+		display: flex;
+		margin: 15px;
+	}
+	#turnOrder .avatarRim.currentTurn {
+		text-shadow: 2px 1px 0px #ffffff, 0px 0px 10px #faff00, 1px 1px 5px white;
+   		border: #ffff5ca8 solid;
+	}
+	#turnOrder .avatarRim:nth-child(2n){
+		background: #373748;
+		color: #e2e2e2;
+	}
+	#players .myPlayerIcon{
+		border-color: #f9efff;
+		border-style: dashed;
+	}
+	#restartGame{
+		position: absolute;
+		bottom: 0px;
+		margin-bottom: 21px;
+		right: 0px;
+		margin-right: 25px;
+		background: #f9efff;
+		padding: 12;
+		border-radius: 16px;
+		border: dashed #b19191;
+		opacity: 0.8;
+	}
+	#restartGame:hover {
+		filter: contrast(0.5);
+	}
+	#evalBar{
+		width: 40px;
+		position: relative;
+    	background: #f1f1fc;
+		border: 1px solid black;
+		border-radius: 8px;
+		margin: 7px 0px;
+	}
+	#centipawns{
+		position: absolute;
+		color: white;
+		width: 100%;
+		text-align: center;
+		margin-top: 4px;
+		font-size: small;
+	}
+	#centipawns.whiteSide{
+		color: black;
+		margin-bottom: 4px;
+		bottom: 0;
+	}
+	#blackBar{
+		background: #101311;
+	}
+	#turnOrder .avatarRim .gearIcon{
+		background-image: url(/img/gear_2699.png) !important;
+		max-width: 25px;
+		background-size: contain;
+		background-repeat: no-repeat;
+		cursor: pointer;
+	}
