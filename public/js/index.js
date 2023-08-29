@@ -363,6 +363,7 @@
 	var chessDelay = 0;
 	function doNextMoveIfBot(){
 		if(getCurrentTurn() == 'robot'){
+            allowDoubleMoves()
 			chessDelay = Date.now()
 			stockfish.postMessage("position fen " + game.fen())
 			
@@ -412,18 +413,16 @@
 	}
 
 	function allowDoubleMoves(){
-		if(getCurrentTurn() == networkSync.myId){
-			var isWhiteTurn = networkSync.turnOrder.turnOrderIndex % 2 == 0
-			var gameStateIsWhite = game.turn() == "w"  
-			if( (!isWhiteTurn && gameStateIsWhite) || (isWhiteTurn && !gameStateIsWhite)){
-				//game and turn order not in sync, lets manually change it
-				var arr = game.fen().split(' ')
-				arr[1] = isWhiteTurn ? 'w' : 'b'
-				arr[3] = '-'
-				var newfen = arr.join(' ')
-				board.position(newfen)
-				game.load(newfen)
-			}
+		var isWhiteTurn = networkSync.turnOrder.turnOrderIndex % 2 == 0
+		var gameStateIsWhite = game.turn() == "w"  
+		if( (!isWhiteTurn && gameStateIsWhite) || (isWhiteTurn && !gameStateIsWhite)){
+			//game and turn order not in sync, lets manually change it
+			var arr = game.fen().split(' ')
+			arr[1] = isWhiteTurn ? 'w' : 'b'
+			arr[3] = '-'
+			var newfen = arr.join(' ')
+			board.position(newfen)
+			game.load(newfen)
 		}
 	}
 
