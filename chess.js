@@ -16,7 +16,11 @@ const avaGenerator = new randomAvatarGenerator.AvatarGenerator()
 const config = require('./config.json');
 certFileLocation = config.certFileLocation;
 keyFileLocation = config.keyFileLocation;
-port = config.port;
+
+let port = process.env.PORT;
+if (port == null || port == "") {
+    port = config.port || 8000;
+}
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
