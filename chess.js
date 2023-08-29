@@ -40,7 +40,7 @@ if (fs.existsSync(config.keyFileLocation) && fs.existsSync(config.certFileLocati
   server = http.createServer(app);
 }
 
-server.listen(port, "127.0.0.1", () => {
+server.listen(port, "0.0.0.0", () => {
     console.log(`Server running at http://127.0.0.1:${port}/`);
 });
 

@@ -336,7 +336,7 @@
 <script>
 	// Create WebSocket connection.
 	let socket = null;
-	port = 42000
+	port = window.location.port
 	websocketSecurity = window.location.protocol == 'http:' ? 'ws' : 'wss' 
 	socket = new WebSocket(`${websocketSecurity}://${window.location.hostname}:${port}`);
 	// example ws://yourwebsite.com:42000
