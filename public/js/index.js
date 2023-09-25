@@ -500,7 +500,7 @@
 	
 	board = Chessboard('myBoard', config)
 	stockfish.postMessage("uci")
-	stockfish.postMessage("setoption name Skill Level value 0")
+	stockfish.postMessage("setoption name Skill Level value 10")
 	stockfish.postMessage('setoption name Skill Level Maximum Error value 900')
 	stockfish.postMessage('setoption name Skill Level Probability value 10')
 	$(window).resize(resizeboard)
