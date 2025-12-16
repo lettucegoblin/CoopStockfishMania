@@ -13,6 +13,11 @@
 
 <link rel="stylesheet" href="css/index.css">
 
+<!-- Game Over Toast Notification -->
+<div id="gameOver" class="toast">
+	<div id="gameOverText"></div>
+</div>
+
 <div id='gameWrapper'>
 	<div id='boardWrapper'>
 		<div id='evalBar'>
@@ -24,9 +29,21 @@
 
 	<div id='turnOrderWrapper'>
 		<div id='players'>
-			
+
 		</div>
 		<div id='turnOrder'></div>
 		<div id='restartGame'>Restart Game</div>
+	</div>
+</div>
+
+<!-- Difficulty Modal -->
+<div id="difficultyModal" class="modal">
+	<div class="modal-content">
+		<span class="close">&times;</span>
+		<h2>Bot Difficulty</h2>
+		<p>Set Stockfish skill level (0 = easiest, 20 = hardest)</p>
+		<input type="range" id="difficultySlider" min="0" max="20" value="10" step="1">
+		<div id="difficultyValue">Level: 10</div>
+		<button id="saveDifficulty">Save</button>
 	</div>
 </div>

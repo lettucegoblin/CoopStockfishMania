@@ -15,6 +15,7 @@
 	}
 
 	var myId = 1234
+	var botDifficulty = 10 // Stockfish skill level (0-20)
 
 	var robots = {
 		412412:{
@@ -46,7 +47,10 @@
 			
 		}
 		$('#turnOrder .avatarRim .gearIcon').click(function(e){
-			console.log('clciky', e)
+			e.stopPropagation()
+			document.getElementById('difficultyModal').style.display = 'block'
+			document.getElementById('difficultySlider').value = botDifficulty
+			document.getElementById('difficultyValue').textContent = 'Level: ' + botDifficulty
 		})
 		updateTurnOrderHighlight()
 		//turnOrderDiv.appendChild(defaultRobot.cloneNode(true))
@@ -92,8 +96,10 @@
 	// Create WebSocket connection.
 	let socket = null;
 	port = window.location.port
-	websocketSecurity = window.location.protocol == 'http:' ? 'ws' : 'wss' 
-	socket = new WebSocket(`${websocketSecurity}://${window.location.hostname}:${port}`);
+	websocketSecurity = window.location.protocol == 'http:' ? 'ws' : 'wss'
+	// Use the current path (e.g., /chess/) or connect directly if on custom port
+	let wsPath = port ? `${websocketSecurity}://${window.location.hostname}:${port}` : `${websocketSecurity}://${window.location.hostname}${window.location.pathname}`;
+	socket = new WebSocket(wsPath);
 	// example ws://yourwebsite.com:42000
 
     // Connection opened
@@ -149,7 +155,7 @@
 					window.history.pushState({}, '', url);
 				}
 				cullUsersInStorage(payload.theirUsers)
-				
+
 				addUserToStorage(payload.myId, payload.myUsername)
 				networkSync.myId = payload.myId;
 				networkSync.roomId = payload.roomId
@@ -160,11 +166,21 @@
 					networkSync.userIds.push(user.userid)
 					networkSync.players[user.userid] = user
 				}
+				// Set bot difficulty from server
+				if(payload.botDifficulty !== undefined) {
+					updateStockfishDifficulty(payload.botDifficulty)
+				}
 				initPlayers()
 				updateTurnOrderUI()
 				initBoard(networkSync.turnOrder)
 				setCentipawn(payload.centipawns)
 				doNextMoveIfBot()
+				break;
+			case "setBotDifficulty":
+				updateStockfishDifficulty(payload.difficulty)
+				document.getElementById('difficultySlider').value = payload.difficulty
+				document.getElementById('difficultyValue').textContent = 'Level: ' + payload.difficulty
+				console.log('Bot difficulty updated to:', payload.difficulty)
 				break;
 			case "turnOrderUpdate":
 				if(payload.turnOrder.serverTimestamp > networkSync.turnOrder.serverTimestamp){
@@ -216,13 +232,60 @@
 
 	function networkMove(moveObj, fen){
 		game.move(moveObj)
-		
+
 		console.log('networkMove', game.fen(), fen, game.fen() == fen )
 		if(game.fen() !== fen){
 			//we outta sync
 			game.load(fen)
 		}
 		board.position(game.fen())
+		checkGameOver()
+	}
+
+	var gameOverTimeout = null
+
+	function checkGameOver() {
+		var gameOverDiv = document.getElementById('gameOver')
+		var gameOverText = document.getElementById('gameOverText')
+
+		if (game.game_over()) {
+			var message = ''
+			if (game.in_checkmate()) {
+				// Determine winner based on whose turn it is (they lost)
+				var winner = game.turn() === 'w' ? 'Black' : 'White'
+				message = 'Game Over - ' + winner + ' wins by checkmate!'
+			} else if (game.in_draw()) {
+				message = 'Game Over - Draw!'
+			} else if (game.in_stalemate()) {
+				message = 'Game Over - Stalemate!'
+			} else if (game.in_threefold_repetition()) {
+				message = 'Game Over - Draw by repetition!'
+			} else if (game.insufficient_material()) {
+				message = 'Game Over - Draw by insufficient material!'
+			} else {
+				message = 'Game Over!'
+			}
+			gameOverText.textContent = message
+
+			// Clear any existing timeout
+			if (gameOverTimeout) {
+				clearTimeout(gameOverTimeout)
+			}
+
+			// Show toast with fade in
+			gameOverDiv.classList.remove('hide')
+			gameOverDiv.classList.add('show')
+
+			// Auto-hide after 5 seconds
+			gameOverTimeout = setTimeout(function() {
+				gameOverDiv.classList.remove('show')
+				gameOverDiv.classList.add('hide')
+			}, 5000)
+		} else {
+			// Hide immediately on reset
+			gameOverDiv.classList.remove('show')
+			gameOverDiv.classList.add('hide')
+		}
 	}
 	
 	var turnOrderDiv = document.getElementById('turnOrder')
@@ -324,11 +387,12 @@
 			}
 			setTimeout(function(){
 				var moveObj = {from: match[1], to: match[2], promotion: match[3]}
-			
+
 				game.move(moveObj);
 				notifyMove(moveObj, false)
 				board.position(game.fen())
-				
+				checkGameOver()
+
 				doNextMoveIfBot()
 			}, delayDiff)
 			
@@ -441,6 +505,7 @@
 		if (move === null) return 'snapback'
 		notifyMove(moveObj)
 		updateTurnOrderHighlight()
+		checkGameOver()
 		//debugger
 		doNextMoveIfBot()
 //stockfish.postMessage("position startpos moves" + get_moves())
@@ -500,9 +565,19 @@
 	
 	board = Chessboard('myBoard', config)
 	stockfish.postMessage("uci")
-	stockfish.postMessage("setoption name Skill Level value 10")
-	stockfish.postMessage('setoption name Skill Level Maximum Error value 900')
-	stockfish.postMessage('setoption name Skill Level Probability value 10')
+
+	// Function to update Stockfish difficulty
+	function updateStockfishDifficulty(level) {
+		botDifficulty = level
+		stockfish.postMessage("setoption name Skill Level value " + level)
+		// Adjust error margins based on difficulty
+		var maxError = level < 10 ? 1000 - (level * 50) : 500 - ((level - 10) * 40)
+		stockfish.postMessage('setoption name Skill Level Maximum Error value ' + maxError)
+		stockfish.postMessage('setoption name Skill Level Probability value ' + Math.max(1, level))
+	}
+
+	// Initialize with default difficulty
+	updateStockfishDifficulty(botDifficulty)
 	$(window).resize(resizeboard)
 	
 	resizeboard()
@@ -515,12 +590,49 @@
 		networkSync.turnOrder.turnNum = 0
 		updateTurnOrderUI()
 		setCentipawn(0)
+		checkGameOver()
 	}
 	$('#restartGame').click(function(){
-		//reset board 
+		//reset board
 		var payload = {
 			requestType: 'resetBoard'
 		}
 		socket.send(JSON.stringify(payload));
 		doNextMoveIfBot()
 	})
+
+	// Difficulty Modal Event Listeners
+	var modal = document.getElementById('difficultyModal')
+	var closeBtn = document.querySelector('.close')
+	var slider = document.getElementById('difficultySlider')
+	var valueDisplay = document.getElementById('difficultyValue')
+	var saveBtn = document.getElementById('saveDifficulty')
+
+	// Close modal when clicking X
+	closeBtn.onclick = function() {
+		modal.style.display = 'none'
+	}
+
+	// Close modal when clicking outside
+	window.onclick = function(event) {
+		if (event.target == modal) {
+			modal.style.display = 'none'
+		}
+	}
+
+	// Update display when slider moves
+	slider.oninput = function() {
+		valueDisplay.textContent = 'Level: ' + this.value
+	}
+
+	// Save difficulty and close modal
+	saveBtn.onclick = function() {
+		var newDifficulty = parseInt(slider.value)
+		// Send to server to sync with all clients
+		var payload = {
+			requestType: 'setBotDifficulty',
+			difficulty: newDifficulty
+		}
+		socket.send(JSON.stringify(payload))
+		modal.style.display = 'none'
+	}

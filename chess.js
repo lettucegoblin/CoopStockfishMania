@@ -86,7 +86,8 @@ wss.on('connection', function connection(ws, request, client) {
                                 turnOrderIndex: 0,
                                 lastGameBoardFen: undefined,
                                 centipawns: 0
-                            }
+                            },
+                            botDifficulty: 10
                         }
                     }
                 }
@@ -141,7 +142,8 @@ wss.on('connection', function connection(ws, request, client) {
                     allUsers: userArr,
                     roomId: ws.user.roomId,
                     theirUsers: theirUsers,
-                    centipawns: rooms[ws.user.roomId].gameState.turnOrder.centipawns
+                    centipawns: rooms[ws.user.roomId].gameState.turnOrder.centipawns,
+                    botDifficulty: rooms[ws.user.roomId].gameState.botDifficulty
                 }
                 ws.send(JSON.stringify(payload));
                 break;
@@ -159,6 +161,20 @@ wss.on('connection', function connection(ws, request, client) {
                         var payload = {
                             requestType: messageJson.requestType,
                             moveObj: messageJson,
+                        }
+                        var data = JSON.stringify(payload);
+                        client.send(data);
+                    }
+                });
+                break;
+            case "setBotDifficulty":
+                rooms[ws.user.roomId].gameState.botDifficulty = messageJson.difficulty
+                // Broadcast to all clients in the room
+                wss.clients.forEach(function each(client) {
+                    if (client.readyState === WebSocket.OPEN && client.user.roomId == ws.user.roomId) {
+                        var payload = {
+                            requestType: "setBotDifficulty",
+                            difficulty: messageJson.difficulty
                         }
                         var data = JSON.stringify(payload);
                         client.send(data);

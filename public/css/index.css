@@ -55,7 +55,7 @@
 		border-radius: 14px;
 	}
 	.deletePlayerOverlay{
-		background: url(/img/icons8-trash-50.png);
+		background: url(../img/icons8-trash-50.png);
 		background-color: #d263655c;
 	}
 	.avatarRim{
@@ -97,10 +97,10 @@
 		display: none;
 	}
 	.robotIcon{
-		background-image: url(/img/icons8-robotic-48.png) !important;
+		background-image: url(../img/icons8-robotic-48.png) !important;
 	}
 	#players .playerIcon{
-		background-image: url(/img/icons8-dolphin-16.png);
+		background-image: url(../img/icons8-dolphin-16.png);
 		background-position: center;
     	background-size: contain;
 	}
@@ -189,9 +189,155 @@
 		background: #101311;
 	}
 	#turnOrder .avatarRim .gearIcon{
-		background-image: url(/img/gear_2699.png) !important;
+		background-image: url(../img/gear_2699.png) !important;
 		max-width: 25px;
 		background-size: contain;
 		background-repeat: no-repeat;
 		cursor: pointer;
 	}
+/* Difficulty Modal Styles */
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 1000;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+	background-color: #2a2a2a;
+	margin: 15% auto;
+	padding: 30px;
+	border: 2px solid #888;
+	border-radius: 10px;
+	width: 80%;
+	max-width: 400px;
+	color: #fff;
+	box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.modal-content h2 {
+	margin-top: 0;
+	color: #4CAF50;
+}
+
+.modal-content p {
+	color: #ccc;
+	font-size: 14px;
+}
+
+.close {
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+	line-height: 20px;
+	cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+	color: #fff;
+}
+
+#difficultySlider {
+	width: 100%;
+	margin: 20px 0;
+	height: 8px;
+	border-radius: 5px;
+	background: #444;
+	outline: none;
+}
+
+#difficultySlider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #4CAF50;
+	cursor: pointer;
+}
+
+#difficultySlider::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #4CAF50;
+	cursor: pointer;
+}
+
+#difficultyValue {
+	text-align: center;
+	font-size: 18px;
+	font-weight: bold;
+	color: #4CAF50;
+	margin-bottom: 20px;
+}
+
+#saveDifficulty {
+	width: 100%;
+	padding: 12px;
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	font-size: 16px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+#saveDifficulty:hover {
+	background-color: #45a049;
+}
+
+/* Game Over Toast Notification */
+.toast {
+	position: fixed;
+	top: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 9999;
+	padding: 16px 32px;
+	border-radius: 8px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+	opacity: 0;
+	transition: opacity 0.3s ease-in-out;
+	pointer-events: none;
+	max-width: 90%;
+}
+
+.toast.show {
+	opacity: 1;
+}
+
+.toast.hide {
+	opacity: 0;
+}
+
+#gameOverText {
+	font-size: 20px;
+	font-weight: bold;
+	color: #fff;
+	text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+	letter-spacing: 0.5px;
+	white-space: nowrap;
+	text-align: center;
+}
+
+@media (max-width: 768px) {
+	.toast {
+		padding: 12px 20px;
+		top: 10px;
+	}
+
+	#gameOverText {
+		font-size: 16px;
+		white-space: normal;
+	}
+}
