@@ -16,9 +16,9 @@
 		filter: drop-shadow(-3px 3px 4px grey);
 	}
 	#gameWrapper{
-		display: inline-flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
+	        display: flex;
+	        flex-direction: row;
+	        flex-wrap: nowrap;
 		width: 100%;
 		height: 100%;
 	}
@@ -67,21 +67,49 @@
 		border-radius: 40px;
 	}
 	#myBoard{
-		width: calc(100% - 40px)
-		
+	        width: calc(100% - 40px);
+	        border: 5px solid transparent;
+	        box-sizing: border-box;
+	        transition: border-color 0.3s, box-shadow 0.3s;
+	}
+	#myBoard.myTurnHighlight {
+	        border-color: #faff00;
+	        box-shadow: 0 0 15px #faff00;
 	}
 	@media only screen and (orientation:portrait){
-		#gameWrapper{
-			flex-direction: column;
-		}
-		#boardWrapper{
-			max-height: 50%;
-			max-width: 100%;
-			justify-content: center;
-		}
-		#turnOrderWrapper{
-			flex-grow: 12;
-		}
+	        #gameWrapper{
+	                flex-direction: column-reverse;
+	        }
+	        #boardWrapper{
+	                height: 66%;
+	                max-height: 66%;
+	                max-width: 100%;
+	                justify-content: center;
+	                flex: 0 0 66%;
+	                margin: 0;
+	                padding: 6px;
+	                box-sizing: border-box;
+	        }
+	        #turnOrderWrapper{
+	                height: 34%;
+	                max-height: 34%;
+	                flex: 0 0 34%;
+	                margin: 0;
+	                position: relative;
+	                display: flex;
+	                flex-direction: column;
+	                padding: 6px;
+	                box-sizing: border-box;
+	        }
+	        #turnOrder {
+	                overflow-y: auto;
+	                margin-bottom: 60px; /* Space for controls */
+	        }
+	        #gameControlsContainer {
+	                margin-bottom: 5px;
+	                margin-right: 10px;
+	                z-index: 10;
+	        }
 	}
 	#players .avatarRim .gearIcon{
 		display: none;
@@ -97,8 +125,21 @@
 		display: none;
 	}
 	.robotIcon{
-		background-image: url(../img/icons8-robotic-48.png) !important;
+	        background-image: url(../img/icons8-robotic-48.png) !important;
 	}
+	.botLevel {
+	    position: absolute;
+	    bottom: 2px;
+	    right: 2px;
+	    background: rgba(255, 0, 0, 0.7);
+	    color: white;
+	    font-size: 10px;
+	    padding: 1px 4px;
+	    border-radius: 4px;
+	    font-weight: bold;
+	    pointer-events: none;
+	}
+
 	#players .playerIcon{
 		background-image: url(../img/icons8-dolphin-16.png);
 		background-position: center;
@@ -132,12 +173,14 @@
 		background-position: center !important;
     	background-repeat: no-repeat !important;
 	}
-	#turnOrder .avatarRim div{
+	#turnOrder .avatarRim > .playerName, #turnOrder .avatarRim > .disconnectText {
 		flex-grow: 1;
 		display: flex;
 		margin: 15px;
 	}
-	#turnOrder .avatarRim.currentTurn {
+    #turnOrder .avatarRim.myPlayerIcon {
+    }
+        #turnOrder .avatarRim.currentTurn {
 		text-shadow: 2px 1px 0px #ffffff, 0px 0px 10px #faff00, 1px 1px 5px white;
    		border: #ffff5ca8 solid;
 	}
@@ -149,20 +192,34 @@
 		border-color: #f9efff;
 		border-style: dashed;
 	}
-	#restartGame{
+	#gameControlsContainer {
 		position: absolute;
 		bottom: 0px;
 		margin-bottom: 21px;
 		right: 0px;
 		margin-right: 25px;
+		display: flex;
+		gap: 10px;
+		align-items: center;
+	}
+	#gameControlsContainer > div {
 		background: #f9efff;
-		padding: 12;
+		padding: 12px;
 		border-radius: 16px;
 		border: dashed #b19191;
 		opacity: 0.8;
+		cursor: pointer;
 	}
-	#restartGame:hover {
+	#gameControlsContainer > div:hover {
 		filter: contrast(0.5);
+	}
+	#undoButton {
+		font-size: 20px;
+		display: none;
+	}
+	#tutorialButton {
+		font-size: 20px;
+		font-weight: bold;
 	}
 	#evalBar{
 		width: 40px;
@@ -190,7 +247,9 @@
 	}
 	#turnOrder .avatarRim .gearIcon{
 		background-image: url(../img/gear_2699.png) !important;
-		max-width: 25px;
+		width: 25px;
+        height: 25px;
+        align-self: center;
 		background-size: contain;
 		background-repeat: no-repeat;
 		cursor: pointer;

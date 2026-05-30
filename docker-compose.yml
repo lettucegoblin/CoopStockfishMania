@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  chess:
+    build: .
+    container_name: chess
+    restart: unless-stopped
+    networks:
+      - web_proxy
+    environment:
+      - PORT=42000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chess.rule=Host(`goblinpowered.com`) && (PathPrefix(`/chess/`) || Path(`/chess`))"
+      - "traefik.http.routers.chess.entrypoints=websecure"
+      - "traefik.http.routers.chess.tls.certresolver=myresolver"
+      - "traefik.http.services.chess.loadbalancer.server.port=42000"
+      - "traefik.http.middlewares.chess-redirect.redirectregex.regex=^https?://goblinpowered.com/chess$$"
+      - "traefik.http.middlewares.chess-redirect.redirectregex.replacement=https://goblinpowered.com/chess/"
+      - "traefik.http.middlewares.chess-strip.stripprefix.prefixes=/chess"
+      - "traefik.http.routers.chess.middlewares=chess-redirect,chess-strip"
+
+networks:
+  web_proxy:
+    external: true

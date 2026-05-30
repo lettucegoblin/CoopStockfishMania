@@ -1,4 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coop Chess Mania</title>
 <link rel="stylesheet" href="css/chessboard-1.0.0.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
 <script src="js/chessboard-1.0.0.min.js"></script>
@@ -12,38 +17,130 @@
 <script src="js/tour.js" defer></script>
 
 <link rel="stylesheet" href="css/index.css">
+<style>
+    /* Scoped Overlay Styles */
+    #boardWrapper { position: relative; }
+    #pauseOverlay {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        z-index: 100;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        border-radius: 4px;
+        pointer-events: all;
+    }
+    #pauseOverlay h2 { font-size: 2em; margin-bottom: 10px; }
+    #readyButton {
+        padding: 12px 30px;
+        font-size: 1.2em;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.1s, background 0.2s;
+    }
+    #readyButton:hover { background: #45a049; }
+    #readyButton:active { transform: scale(0.95); }
+    
+    .readyIndicator {
+        width: 10px;
+        height: 10px;
+        flex-grow: 0 !important;
+        flex-shrink: 0 !important;
+        border-radius: 50%;
+        background: #ff5722;
+        display: inline-block;
+        margin-left: 8px;
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+    .readyIndicator.isReady { background: #4caf50; }
 
-<!-- Game Over Toast Notification -->
-<div id="gameOver" class="toast">
-	<div id="gameOverText"></div>
-</div>
+    #autoRestartLabel {
+        color: white;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    #autoRestartCheckbox { cursor: pointer; }
+
+    @media only screen and (orientation:portrait){
+        #pauseOverlay {
+            left: 0;
+            width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
 
 <div id='gameWrapper'>
-	<div id='boardWrapper'>
-		<div id='evalBar'>
-			<div id='centipawns'></div>
-			<div id='blackBar'></div>
-		</div>
-		<div id="myBoard"></div>
-	</div>
+        <div id='boardWrapper'>
+                <div id='evalBar'>
+                        <div id='centipawns'></div>
+                        <div id='blackBar'></div>
+                </div>
+                <div id="myBoard"></div>
+                
+                <!-- Scoped Pause Overlay -->
+                <div id="pauseOverlay">
+                    <h3 style="font-size: 1.8em; margin-bottom: 5px;">Game Paused</h3>
+                    <p style="margin-bottom: 10px;">Wait for re-ready...</p>
+                    <button id="readyButton">Ready Up!</button>
+                </div>
 
-	<div id='turnOrderWrapper'>
-		<div id='players'>
+                <!-- End Game Overlay -->
+                <div id="endGameOverlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 110; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; border-radius: 4px;">
+                    <h2 id="endGameTitle">Checkmate!</h2>
+                    <p id="endGameDescription">White wins</p>
+                    <button class="restartBtn" style="padding: 10px 25px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">New Game</button>
+                </div>
+        </div>
 
-		</div>
-		<div id='turnOrder'></div>
-		<div id='restartGame'>Restart Game</div>
-	</div>
+        <div id='turnOrderWrapper'>
+                <div id='players'>
+
+                </div>
+                <div id='turnOrder'></div>
+                <div id='gameControlsContainer'>
+                        <label id="autoRestartLabel"><input type="checkbox" id="autoRestartCheckbox"> Auto-Restart</label>
+                        <div id='tutorialButton'>?</div>
+                        <div id='undoButton'>↶</div>
+                        <div id='flipBoardButton' title="Flip Board">🔃</div>
+                        <div id='restartGame'>Restart Game</div>
+                </div>
+        </div>
 </div>
 
 <!-- Difficulty Modal -->
 <div id="difficultyModal" class="modal">
-	<div class="modal-content">
-		<span class="close">&times;</span>
-		<h2>Bot Difficulty</h2>
-		<p>Set Stockfish skill level (0 = easiest, 20 = hardest)</p>
-		<input type="range" id="difficultySlider" min="0" max="20" value="10" step="1">
-		<div id="difficultyValue">Level: 10</div>
-		<button id="saveDifficulty">Save</button>
-	</div>
+        <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Bot Difficulty</h2>
+                <p>Set Stockfish skill level (0 = easiest, 20 = hardest)</p>
+                <input type="range" id="difficultySlider" min="0" max="20" value="10" step="1">
+                <div id="difficultyValue">Level: 10</div>
+                <button id="saveDifficulty">Save</button>
+        </div>
 </div>
+
+<!-- Game Over Toast Notification -->
+<div id="gameOver" class="toast">
+        <div id="gameOverText"></div>
+</div>
+
+</body>
+</html>
